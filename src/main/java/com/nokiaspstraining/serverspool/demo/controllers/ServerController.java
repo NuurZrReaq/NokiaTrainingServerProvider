@@ -18,8 +18,8 @@ public class ServerController {
     @Autowired
     private ServerService serverService;
 
-    @Autowired
-    private ServerRepo serverRepo;
+   /* @Autowired
+    private ServerRepo serverRepo;*/
 
     @PostMapping("/allocate/{size}")
     @ResponseBody
@@ -40,7 +40,7 @@ public class ServerController {
 
     @DeleteMapping("/delete/{id}")
     public void deleteServer(@PathVariable("id") int id){
-        serverRepo.deleteById(id);
+        serverService.deleteById(id);
     }
 
 }

@@ -10,7 +10,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.access.StateMachineAccess;
-import org.springframework.statemachine.access.StateMachineAccessor;
 import org.springframework.statemachine.access.StateMachineFunction;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.state.State;
@@ -87,7 +86,7 @@ public class ServerService {
     }
 
     private void activate(int serverId) {
-        StateMachine<Enumerations.ServerStatus,Enumerations.ServerEvent> sm = build(serverId);
+        StateMachine<Enumerations.ServerStatus,Enumerations.ServerEvent> sm = buildSM(serverId);
         Message<Enumerations.ServerEvent> eventMessage =MessageBuilder.withPayload(Enumerations.ServerEvent.ACTIVATE)
                 .setHeader("serverId",serverId)
                 .build();
@@ -97,7 +96,7 @@ public class ServerService {
 
     }
 
-    private StateMachine<Enumerations.ServerStatus, Enumerations.ServerEvent> build(int serverId) {
+    private StateMachine<Enumerations.ServerStatus, Enumerations.ServerEvent> buildSM(int serverId) {
         Server server = serverRepo.findById(serverId).orElseThrow();
         String serverID = String.valueOf(server.getKey());
         StateMachine<Enumerations.ServerStatus,Enumerations.ServerEvent> sm = factory.getStateMachine(serverID);
@@ -135,5 +134,9 @@ public class ServerService {
         server.setServerStatus(Enumerations.ServerStatus.CREATING);
         server.setAvaStorage(100 - size);
         return serverRepo.save(server);
+    }
+
+    public void deleteById(int id) {
+        serverRepo.deleteById(id);
     }
 }
