@@ -22,8 +22,9 @@ public class ServerController {
     private ServerRepo serverRepo;
 
     @PostMapping("/allocate/{size}")
-    public void allocateServer(@PathVariable("size") int size){
-        serverService.allocate(size);
+    @ResponseBody
+    public int allocateServer(@PathVariable("size") int size){
+        return serverService.allocate(size);
     }
 
     /*@PostMapping("/create")
