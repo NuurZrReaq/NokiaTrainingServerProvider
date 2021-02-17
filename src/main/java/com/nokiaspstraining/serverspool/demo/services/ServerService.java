@@ -36,7 +36,44 @@ public class ServerService {
 
 
     public int allocate(int size) {
+        List<String> result = new ArrayList<>();
+        result = allocateServer(size);
+        Server server = serverRepo.findById(Integer.parseInt(result.get(2))).orElseThrow();
+        if(result.get(0).equals("True")){
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            activate(server.getKey());
+
+        }
+        else if(result.get(0).equals("False")){
+            if(result.get(1).equals("Active")){
+                return server.getKey();
+            }
+            while(true){
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                server = serverRepo.findById(Integer.parseInt(result.get(2))).orElseThrow();
+                if(server.getServerStatus().equals(Enumerations.ServerStatus.ACTIVE)) break;
+            }
+
+
+
+        }
+
+        return server.getKey();
+    }
+
+
+    private synchronized List<String> allocateServer(int size){
+
         List<Server> activeServers = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         Iterable<Server> servers = serverRepo.findAll();
         for (Server server : servers) {
             if (server.getServerStatus().name().equals("ACTIVE")) {
@@ -47,42 +84,37 @@ public class ServerService {
             if (size <= server.getAvaStorage()) {
                 server.setAvaStorage(server.getAvaStorage() - size);
                 serverRepo.save(server);
-                return server.getKey();
+                result.add("False");
+                result.add("Active");
+                result.add(Integer.toString(server.getKey()));
+                return result;
             }
         }
         servers = serverRepo.findAll();
         for (Server server : servers) {
             if (size <= server.getAvaStorage()) {
                 if (server.getServerStatus().equals(Enumerations.ServerStatus.CREATING)){
-                    Server server1 = null;
-                    while(true){
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        server1 = serverRepo.findById(server.getKey()).get();
-                        if(server1.getServerStatus().equals(Enumerations.ServerStatus.ACTIVE))
-                            break;
-                    }
-                    server1.setAvaStorage(server1.getAvaStorage() - size);
-                    serverRepo.save(server1);
-                    return server1.getKey();
+                    result.add("False");
+                    result.add("Creating");
+                    result.add(Integer.toString(server.getKey()));
+                    server.setAvaStorage(server.getAvaStorage() - size);
+                    serverRepo.save(server);
+                    return result;
                 }
                 server.setAvaStorage(server.getAvaStorage() - size);
                 serverRepo.save(server);
-                return server.getKey();
+                result.add("False");
+                result.add("Active");
+                result.add(Integer.toString(server.getKey()));
+                return result;
             }
         }
-
         Server server = create(size);
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        activate(server.getKey());
-        return server.getKey();
+        result.add("True");
+        result.add("Active");
+        result.add(Integer.toString(server.getKey()));
+        return result;
+
     }
 
     private void activate(int serverId) {
