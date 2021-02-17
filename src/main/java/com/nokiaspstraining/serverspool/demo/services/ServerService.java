@@ -36,7 +36,7 @@ public class ServerService {
 
 
     public int allocate(int size) {
-        List<String> result = new ArrayList<>();
+        List<String> result;
         result = allocateServer(size);
         Server server = serverRepo.findById(Integer.parseInt(result.get(2))).orElseThrow();
         if(result.get(0).equals("True")){
