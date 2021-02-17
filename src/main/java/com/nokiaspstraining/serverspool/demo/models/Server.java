@@ -8,7 +8,7 @@ import org.springframework.data.aerospike.mapping.Field;
 import org.springframework.data.annotation.Id;
 
 
-@Document(collection = "serverpool2")
+@Document(collection = "serverpp")
 public class Server {
 
     @Id

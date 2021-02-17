@@ -82,7 +82,7 @@ public class ServerService {
             e.printStackTrace();
         }
         activate(server.getKey());
-        return 0;
+        return server.getKey();
     }
 
     private void activate(int serverId) {
@@ -128,9 +128,17 @@ public class ServerService {
 
 
     public Server create(int size) {
-        Random random = new Random( );
+
+        int id;
+        while(true){
+
+            Random random = new Random( );
+            id = random.nextInt(1000000);
+            Server s=serverRepo.findById(id).orElse(null);
+            if(s==null) break;
+        }
         Server server = new Server();
-        server.setKey(random.nextInt(1000000));
+        server.setKey(id);
         server.setServerStatus(Enumerations.ServerStatus.CREATING);
         server.setAvaStorage(100 - size);
         return serverRepo.save(server);
