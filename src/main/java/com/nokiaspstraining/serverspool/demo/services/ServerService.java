@@ -17,6 +17,8 @@ import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.statemachine.support.StateMachineInterceptorAdapter;
 import org.springframework.statemachine.transition.Transition;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +72,8 @@ public class ServerService {
     }
 
 
-    private synchronized List<String> allocateServer(int size){
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    protected List<String> allocateServer(int size){
 
         List<Server> activeServers = new ArrayList<>();
         List<String> result = new ArrayList<>();
